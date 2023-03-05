@@ -6,6 +6,6 @@ namespace Sithec.Models.Respose
     {
         public int CodigoEstatus {get;set;}
         public string Descripcion { get; set; }
-        public List<Operacion> Datos { get; set; }
+        public Operacion Datos { get; set; }
     }
 }

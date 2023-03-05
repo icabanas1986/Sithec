@@ -1,5 +1,10 @@
-using Sithec.Services;
+using AutoMapper;
+using Sithec.Data.Interface;
+using Sithec.Data.Services;
 using Sithec.Interfaces;
+using Sithec.Data.Context;
+using Microsoft.EntityFrameworkCore;
+using Sithec;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +14,21 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IMock,Mock>();
+builder.Services.AddScoped<ISithec,Sithec.Services.Sithec>();
+builder.Services.AddScoped<IDataServices,DataServices>();
+//builder.Services.AddAutoMapper();
+builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<DataBaseContext>(options=>
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
+
+var mapperConfig = new MapperConfiguration(m=>{
+    m.AddProfile(new MapperProfile());
+});
+IMapper mapper = mapperConfig.CreateMapper();
+builder.Services.AddSingleton(mapper);
+builder.Services.AddMvc();
+
 
 var app = builder.Build();
 
