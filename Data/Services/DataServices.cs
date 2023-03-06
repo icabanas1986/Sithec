@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Sithec.Data.Context;
 using Sithec.Data.Interface;
@@ -10,23 +11,18 @@ namespace Sithec.Data.Services
     {
         ILogger<DataServices> logger;
         private DataBaseContext dbContext;
+        private readonly IMapper mapper;
 
-        public DataServices(ILogger<DataServices> _logger,DataBaseContext _dbContext)
+        public DataServices(ILogger<DataServices> _logger,DataBaseContext _dbContext,IMapper _mapper)
         {
             logger = _logger;
             dbContext = _dbContext;
+            mapper = _mapper;
         }
 
         public async Task<Humano> CreaHumano(CreaHumanoRequest request)
         {
-            Humano humano = new Humano()
-            {
-                Altura = request.Altura,
-                Edad = request.Edad,
-                Nombre = request.Nombre,
-                Peso = request.Peso,
-                Sexo  = request.Sexo
-            };
+            Humano humano = mapper.Map<Humano>(request);
             dbContext.Humanos.Add(humano);
             int insertado = await dbContext.SaveChangesAsync();
             if(Convert.ToBoolean(insertado))
@@ -50,24 +46,15 @@ namespace Sithec.Data.Services
 
         public async Task<Humano> ActualizaHumano(ActualizaHumanoRequest request)
         {
-            var humano = await dbContext.Humanos.Where(h=>h.Id.Equals(request.Id)).FirstOrDefaultAsync();
+            Humano humano = await dbContext.Humanos.Where(h=>h.Id.Equals(request.Id)).FirstOrDefaultAsync();
             if(humano!=null)
             {
-                Humano humanoUpd = new Humano()
-                {
-                    Altura = request.Altura,
-                    Edad = request.Edad,
-                    Nombre = request.Nombre,
-                    Peso = request.Peso,
-                    Sexo = request.Sexo,
-                    Id = request.Id
-                };
-
-                dbContext.Humanos.Update(humanoUpd);
+                humano = mapper.Map<Humano>(request);
+                dbContext.Humanos.Update(humano);
                 var updated = await dbContext.SaveChangesAsync();
                 if(Convert.ToBoolean(updated))
                 {
-                    return humanoUpd;
+                    return humano;
                 }
                 else{
                     return null;
