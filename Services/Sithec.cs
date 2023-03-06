@@ -3,6 +3,7 @@ using Sithec.Interfaces;
 using Sithec.Models.Models;
 using Sithec.Models.Request;
 using Sithec.Models.Respose;
+using AutoMapper;
 
 namespace Sithec.Services
 {
@@ -11,10 +12,12 @@ namespace Sithec.Services
         ILogger<Sithec> logger;
         IDataServices dataServices;
         
-        public Sithec(ILogger<Sithec> _logger,IDataServices _dataServices)
+        private readonly IMapper mapper;
+        public Sithec(ILogger<Sithec> _logger,IDataServices _dataServices,IMapper _mapper)
         {
             logger = _logger;
             dataServices = _dataServices;
+            mapper = _mapper;
         }
 
         public async Task<List<HumanoModel>> GetMock()
@@ -85,13 +88,7 @@ namespace Sithec.Services
                 var humano = await dataServices.CreaHumano(request);
                 if(humano!=null)
                 {
-                    model.Altura = humano.Altura;
-                    model.Edad = humano.Edad;
-                    model.Id = humano.Id;
-                    model.Nombre = humano.Nombre;
-                    model.Peso = humano.Peso;
-                    model.Sexo = humano.Sexo;
-                    response.Datos = model;
+                    response.Datos = mapper.Map<HumanoModel>(humano);
                     response.CodigoEstatus = 200;
                     response.Descripcion = "OK:Humano creado con exito";
                 }
@@ -107,22 +104,13 @@ namespace Sithec.Services
         public async Task<HumanoResponse> ObtieneHumanos()
         {
             HumanoResponse response = new HumanoResponse();
-            HumanoModel model = new HumanoModel();
             List<HumanoModel> humanoList = new List<HumanoModel>();
             var humanos = await dataServices.ObtieneHumanos();
             if(humanos.Count>0)
             {
                 foreach(var humano in humanos)
                 {
-                    
-                    model.Altura = humano.Altura;
-                    model.Edad = humano.Edad;
-                    model.Id = humano.Id;
-                    model.Nombre = humano.Nombre;
-                    model.Peso = humano.Peso;
-                    model.Sexo = humano.Sexo;
-                    humanoList.Add(model);
-                    model = new HumanoModel();
+                    humanoList.Add(mapper.Map<HumanoModel>(humano));
                 }
                 response.Datos = humanoList;
                 response.CodigoEstatus = 200;
@@ -140,18 +128,11 @@ namespace Sithec.Services
         public async Task<HumanoResponse> ObtieneHumano(int id)
         {
             HumanoResponse response = new HumanoResponse();
-            HumanoModel model = new HumanoModel();
             List<HumanoModel> humanoList = new List<HumanoModel>();
             var humano = await dataServices.ObtieneHumano(id);
             if(humano!=null)
             {
-                model.Altura = humano.Altura;
-                model.Edad = humano.Edad;
-                model.Id = humano.Id;
-                model.Nombre = humano.Nombre;
-                model.Peso = humano.Peso;
-                model.Sexo = humano.Sexo;
-                humanoList.Add(model);
+                humanoList.Add(mapper.Map<HumanoModel>(humano));
                 response.Datos = humanoList;
                 response.CodigoEstatus = 200;
                 response.Descripcion = "Ok";
@@ -168,18 +149,11 @@ namespace Sithec.Services
         public async Task<HumanoResponse> UpdateHumano(ActualizaHumanoRequest request)
         {
             HumanoResponse response = new HumanoResponse();
-            HumanoModel model = new HumanoModel();
             List<HumanoModel> humanoList = new List<HumanoModel>();
-            var updated = await dataServices.ActualizaHumano(request);
-            if(updated!=null)
+            var humano = await dataServices.ActualizaHumano(request);
+            if(humano!=null)
             {
-                model.Altura = updated.Altura;
-                model.Edad = updated.Edad;
-                model.Id = updated.Id;
-                model.Nombre = updated.Nombre;
-                model.Peso = updated.Peso;
-                model.Sexo = updated.Sexo;
-                humanoList.Add(model);
+                humanoList.Add(mapper.Map<HumanoModel>(humano));
                 response.CodigoEstatus = 200;
                 response.Datos = humanoList;
                 response.Descripcion = "Ok";

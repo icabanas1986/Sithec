@@ -11,6 +11,8 @@ namespace Sithec
         public MapperProfile()
         {
             CreateMap<CreaHumanoRequest,Humano>();
+            CreateMap<ActualizaHumanoRequest,Humano>();
+            CreateMap<Humano,HumanoModel>();
         }
     }
 }

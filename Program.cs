@@ -22,12 +22,7 @@ builder.Services.AddDbContext<DataBaseContext>(options=>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 
-var mapperConfig = new MapperConfiguration(m=>{
-    m.AddProfile(new MapperProfile());
-});
-IMapper mapper = mapperConfig.CreateMapper();
-builder.Services.AddSingleton(mapper);
-builder.Services.AddMvc();
+builder.Services.AddAutoMapper(typeof(MapperProfile));
 
 
 var app = builder.Build();
